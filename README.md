@@ -1,4 +1,2 @@
 # HzKt
-Kotlin Port of Horizon.io
-
-Short version: I liked the whole horizon concept, but it was more difficult than I wanted to add a REST API on top of it and I'm a fan of Java, Kotlin, and Dropwizard anyway.
+This is a bundle for Dropwizard to add a [Horizon](www.horizon.io). The node server version was frustrating me when I wanted to connect a simple rest endpoint. So I decided to port the whole server to the JVM (I'm using Kotlin) and make it easy to throw into Dropwizard (my preferred microservice framework).
