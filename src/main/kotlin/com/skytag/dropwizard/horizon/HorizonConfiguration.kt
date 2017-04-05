@@ -5,7 +5,7 @@ package com.skytag.dropwizard.horizon
  */
 data class HorizonConfiguration(
     val projectName: String? = "horizon",
-    val startRethinkDb: Boolean? = null,
+    val startRethinkDb: Boolean = false,
     val rethinkdb: RethinkDbConnectionInfo? = null,
     val allowAnonymous: Boolean? = null,
     val allowUnauthenticated: Boolean? = null
