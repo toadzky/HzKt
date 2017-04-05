@@ -1,5 +1,9 @@
 package com.skytag.dropwizard.horizon
 
+import com.skytag.dropwizard.horizon.HzRequestType.KeepAlive
+import com.skytag.dropwizard.horizon.HzRequestType.Store
+import com.skytag.dropwizard.horizon.HzRequestType.Subscribe
+import com.skytag.dropwizard.horizon.decoders.HzRequestDecoder
 import mu.KLogging
 import javax.websocket.OnMessage
 import javax.websocket.OnOpen
@@ -30,9 +34,19 @@ class HorizonWebsocket {
 
         when (msg) {
             is HzHandshake -> write(HzAuthenticationResponse(msg.requestId, msg.method, "token"))
-            is HzKeepAlive -> write(HzAck(msg.requestId))
-            is HzSubscribe -> {
-
+            is HzRequestMessage -> when (msg.type) {
+                KeepAlive -> write(HzAck(msg.requestId))
+                Subscribe -> {
+                    logger.debug { msg }
+                }
+                Store -> (msg as? HzWriteRequest)?.let {
+                    logger.info("storing record. data=[${it.options}]")
+                    write(HzWriteAck(msg.requestId, data=it.options.data.mapIndexed { i, _ -> i }))
+                }
+                else -> {
+                    logger.warn("unhandled request. type=[${msg.type}]")
+                    write(HzAck(msg.requestId))
+                }
             }
             else -> {
                 logger.warn("unrecognized message. msg=[$msg]")
