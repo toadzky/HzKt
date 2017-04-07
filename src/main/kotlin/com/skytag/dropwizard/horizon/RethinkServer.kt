@@ -2,10 +2,17 @@ package com.skytag.dropwizard.horizon
 
 import com.google.common.net.InetAddresses
 import com.google.common.util.concurrent.AbstractIdleService
+import com.google.common.util.concurrent.Uninterruptibles
+import com.rethinkdb.RethinkDB.r
+import com.rethinkdb.gen.exc.ReqlDriverError
+import com.rethinkdb.net.Connection
 import com.skytag.dropwizard.horizon.utils.PortAllocator
+import mu.KLogging
 import java.net.InetAddress
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit.MILLISECONDS
 import java.util.concurrent.TimeUnit.SECONDS
 
 /**
@@ -28,6 +35,12 @@ class RethinkServer(
         cacheSize: Int = 200)
 : AbstractIdleService() {
 
+    companion object : KLogging()
+
+    private lateinit var conn: Connection
+
+    val ready = CompletableFuture<Int>()
+
     private lateinit var proc: Process
     // We need the actual port it's going to use, so instead of trying to parse the lines of the
     // processes output to find it, just randomly select one and
@@ -49,6 +62,19 @@ class RethinkServer(
                 .command(*cmd)
                 .inheritIO()
                 .start()
+        Runtime.getRuntime().addShutdownHook(Thread(proc::destroy))
+
+        do {
+            Uninterruptibles.sleepUninterruptibly(10, MILLISECONDS)
+            try {
+                r.connection().hostname("localhost").port(driver).connect()
+                ready.complete(driver)
+                break
+            } catch (e: ReqlDriverError) {
+                // Do nothing. Try again later.
+                logger.info("failed to connect to database. trying again in 10ms")
+            }
+        } while (true)
     }
 
     override fun shutDown() {
@@ -60,4 +86,5 @@ class RethinkServer(
             }
         }
     }
+
 }

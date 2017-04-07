@@ -1,13 +1,13 @@
-package com.skytag.dropwizard.horizon.decoders
+package com.skytag.dropwizard.horizon.codecs
 
 import com.fasterxml.jackson.core.JsonParser
 import com.fasterxml.jackson.databind.DeserializationContext
 import com.fasterxml.jackson.databind.JsonDeserializer
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
-import com.skytag.dropwizard.horizon.HzFindOptions
-import com.skytag.dropwizard.horizon.HzReadOptions
-import com.skytag.dropwizard.horizon.HzStructuredRead
+import com.skytag.dropwizard.horizon.messages.HzFindOptions
+import com.skytag.dropwizard.horizon.messages.HzReadOptions
+import com.skytag.dropwizard.horizon.messages.HzStructuredRead
 
 /**
  * Created by toadzky on 4/4/17.

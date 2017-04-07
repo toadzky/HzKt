@@ -1,17 +1,20 @@
-package com.skytag.dropwizard.horizon
+package com.skytag.dropwizard.horizon.codecs
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import javax.websocket.Encoder
+import com.skytag.dropwizard.horizon.messages.HzMessage
+import javax.websocket.Encoder.Text
 import javax.websocket.EndpointConfig
 
 /**
  * Created by toadzky on 3/31/17.
  */
-class HzMessageEncoder : Encoder.Text<HzMessage> {
+class HzMessageEncoder : Text<HzMessage> {
     private val json = ObjectMapper()
             .setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE)
+            .setSerializationInclusion(NON_NULL)
             .registerKotlinModule()
 
     override fun init(config: EndpointConfig?) {}
